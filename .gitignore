@@ -5,3 +5,4 @@
 .npm
 .eslintcache
 /dist/
+/src/generated/prisma
