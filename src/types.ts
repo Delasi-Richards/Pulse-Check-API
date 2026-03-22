@@ -9,7 +9,7 @@ export const monitorSchema = z.object({
   timeout: z
     .number("incorrect format for 'timeout'")
     .multipleOf(1, "'timeout' must be a whole number")
-    .gte(1, "'timeout' must be between 1 and 86400").lte(86400, "'timeout' must be between 1 and 86400"),
+    .gte(1, "'timeout' must be between 1 and 10,080").lte(10080, "'timeout' must be between 1 and 10,080"),
   alert_email: z.email("incorrect format for 'alert_email'"),
   deadline: z.date().optional(),
   status: z.string().optional()

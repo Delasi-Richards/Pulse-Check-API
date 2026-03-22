@@ -7,7 +7,7 @@ export async function createMonitor(req: Request, res: Response) {
   try {
     const monitor = monitorSchema.parse(req.body);
   
-    const existingMonitor = prisma.monitor.findFirst({ where: { device_id: monitor.device_id } });
+    const existingMonitor = await prisma.monitor.findUnique({ where: { device_id: monitor.device_id } });
     if (existingMonitor != null) {
       console.log(`Monitor for ${monitor.device_id} already exists`);
       return res.status(400).json({"error": `Monitor for ${monitor.device_id} already exists`});
