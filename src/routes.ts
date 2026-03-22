@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createMonitor, getMonitor, getMonitors, pauseMonitor, pingMonitor } from "./controllers.js";
+import { createMonitor, deleteMonitor, getMonitor, getMonitors, pauseMonitor, pingMonitor, resetMonitor, updateMonitor } from "./controllers.js";
 
 export function RoutersHandler() {
   const router = Router();
@@ -11,8 +11,9 @@ export function RoutersHandler() {
   router.get("/monitors", getMonitors);
   router.get("/monitors/:id", getMonitor);
   
-  // router.put("/monitors/:id");
-  // router.delete("/monitors/:id");
+  router.post("/monitors/:id/reset", resetMonitor);
+  router.put("/monitors", updateMonitor);
+  router.delete("/monitors/:id", deleteMonitor);
 
   return router;
 }

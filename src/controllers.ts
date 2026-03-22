@@ -25,7 +25,7 @@ export async function createMonitor(req: Request, res: Response) {
 
   } catch (err: unknown) {
     if (err instanceof ZodError) {
-      console.log(`errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
       return res.status(400).json({
         "errors": err.issues.map((issue, _) => {return issue.message;})
       });
@@ -66,7 +66,7 @@ export async function pingMonitor(req: Request, res: Response) {
 
   } catch (err: unknown) {
     if (err instanceof ZodError) {
-      console.log(`errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
       return res.status(400).json({
         "errors": err.issues.map((issue, _) => {return issue.message;})
       });
@@ -108,7 +108,7 @@ export async function pauseMonitor(req: Request, res: Response) {
  
   } catch (err: unknown) {
     if (err instanceof ZodError) {
-      console.log(`errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
       return res.status(400).json({
         "errors": err.issues.map((issue, _) => {return issue.message;})
       });
@@ -129,7 +129,7 @@ export async function getMonitors(req: Request, res: Response) {
 
   } catch (err: unknown) {
     if (err instanceof ZodError) {
-      console.log(`errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
       return res.status(500).json({"error": "Failed to successfully fetch available monitors"});
 
     } else {
@@ -158,7 +158,7 @@ export async function getMonitor(req: Request, res: Response) {
 
   } catch (err: unknown) {
     if (err instanceof ZodError) {
-      console.log(`errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
       return res.status(400).json({
         "errors": err.issues.map((issue, _) => {return issue.message;})
       });
@@ -166,6 +166,124 @@ export async function getMonitor(req: Request, res: Response) {
     } else {
       err instanceof Error? console.log(err.message) : console.log(err);
       res.status(500).json({"error": "Failed to successfully fetch monitor"});
+    }
+  }
+}
+
+export async function resetMonitor(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const device_id = deviceIDSchema.parse(id);
+
+    const monitor = await prisma.monitor.findUnique({
+      where: { device_id: device_id }
+    });
+
+    if (monitor == null) {
+      console.log(`No monitor exists for ${device_id}`);
+      return res.status(400).json({"error": `No monitor exists for ${device_id}`});
+    } else if (monitor.status != "DOWN") {
+      console.log(`Monitor for device ${monitor.device_id} is currently ${monitor.status?.toLowerCase()}`);
+      return res.status(400).json({"error": `Monitor for device ${monitor.device_id} is currently ${monitor.status?.toLowerCase()}`});
+    }
+    
+    const updatedMonitor = await prisma.monitor.update({
+      where: { device_id: device_id },
+      data: { status: "ACTIVE", deadline: new Date(Date.now() + monitor.timeout * 60000) }
+    });
+
+    if (updatedMonitor == null) throw new Error("Failed to successfully reset monitor");
+
+    console.log("resetMonitor: Successful\n");
+    res.status(200).json({"message": `Monitor for ${updatedMonitor.device_id} reset successfully`});
+
+  } catch (err: unknown) {
+    if (err instanceof ZodError) {
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      return res.status(400).json({
+        "errors": err.issues.map((issue, _) => {return issue.message;})
+      });
+
+    } else {
+      err instanceof Error? console.log(err.message) : console.log(err);
+      res.status(500).json({"error": "Failed to successfully reset monitor"});
+    }
+  }
+}
+
+export async function updateMonitor(req: Request, res: Response) {
+  try {
+    const newMonitor = monitorSchema.parse(req.body);
+  
+    const monitor = await prisma.monitor.findUnique({
+      where: { device_id: newMonitor.device_id }
+    });
+
+    if (monitor == null) {
+      console.log(`No monitor exists for ${newMonitor.device_id}`);
+      return res.status(400).json({"error": `No monitor exists for ${newMonitor.device_id}`});
+    } else if (monitor.status == "DOWN") {
+      console.log(`Monitor for device ${monitor.device_id} is currently ${monitor.status?.toLowerCase()}`);
+      return res.status(400).json({"error": `Monitor for device ${monitor.device_id} is currently ${monitor.status?.toLowerCase()}`});
+    }
+
+    const updatedMonitor = await prisma.monitor.update({
+      where: { device_id: newMonitor.device_id },
+      data: {
+        timeout: newMonitor.timeout,
+        alert_email: newMonitor.alert_email,
+        deadline: new Date(Date.now() + newMonitor.timeout * 60000)
+      }
+    });
+
+    if (updatedMonitor == null) throw new Error("Failed to successfully ping monitor");
+
+    console.log("updateMonitor: Successful\n");
+    res.status(200).json({"message": `Monitor updated successfully for ${monitor.device_id}`});
+
+  } catch (err: unknown) {
+    if (err instanceof ZodError) {
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      return res.status(400).json({
+        "errors": err.issues.map((issue, _) => {return issue.message;})
+      });
+
+    } else {
+      err instanceof Error? console.log(err.message) : console.log(err);
+      res.status(500).json({"error": "Failed to successfully update monitor"});
+    }
+  }
+}
+
+export async function deleteMonitor(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const device_id = deviceIDSchema.parse(id);
+
+    const monitor = await prisma.monitor.findUnique({
+      where: { device_id: device_id }
+    });
+
+    if (monitor == null) {
+      console.log(`No monitor exists for ${device_id}`);
+      return res.status(400).json({"error": `No monitor exists for ${device_id}`});
+    }
+
+    await prisma.monitor.delete({ where: { device_id: device_id } })
+
+    console.log("deleteMonitor: Successful\n");
+    res.status(200).json({"message": `Monitor deleted successfully for ${monitor.device_id}`});
+
+  } catch (err: unknown) {
+    if (err instanceof ZodError) {
+      console.log(`Validation errors: ${err.issues.map((issue, i) => {return `\n${i + 1}. ${issue.message}`;})}`)
+      return res.status(400).json({
+        "errors": err.issues.map((issue, _) => {return issue.message;})
+      });
+
+    } else {
+      err instanceof Error? console.log(err.message) : console.log(err);
+      res.status(500).json({"error": "Failed to successfully delete monitor"});
     }
   }
 }
