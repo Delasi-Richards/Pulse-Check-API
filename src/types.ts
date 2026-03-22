@@ -1,8 +1,8 @@
 import z from "zod";
 
-export const deviceIDSchema = z.string("incorrect format for 'username'")
-      .startsWith("device-", "'username' must be in format: 'device-xxx'")
-      .length(10, "'username' must be in format: 'device-xxx'")
+export const deviceIDSchema = z.string("incorrect format for 'device_id'")
+      .startsWith("device-", "'device_id' must be in format: 'device-xxx'")
+      .length(10, "'device_id' must be in format: 'device-xxx'")
 
 export const monitorSchema = z.object({
   device_id: deviceIDSchema,

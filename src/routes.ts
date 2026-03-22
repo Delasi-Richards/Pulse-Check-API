@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createMonitor, pauseMonitor, pingMonitor } from "./controllers.js";
+import { createMonitor, getMonitor, getMonitors, pauseMonitor, pingMonitor } from "./controllers.js";
 
 export function RoutersHandler() {
   const router = Router();
@@ -8,8 +8,8 @@ export function RoutersHandler() {
   router.post("/monitors/:id/heartbeat", pingMonitor);
   router.post("/monitors/:id/pause", pauseMonitor);
 
-  // router.get("/monitors");
-  // router.get("/monitors/:id");
+  router.get("/monitors", getMonitors);
+  router.get("/monitors/:id", getMonitor);
   
   // router.put("/monitors/:id");
   // router.delete("/monitors/:id");
