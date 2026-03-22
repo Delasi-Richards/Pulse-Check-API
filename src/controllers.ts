@@ -10,7 +10,8 @@ export async function createMonitor(req: Request, res: Response) {
     await prisma.monitor.create({data: {
       device_id: monitor.device_id,
       timeout: monitor.timeout,
-      alert_email: monitor.alert_email
+      alert_email: monitor.alert_email,
+      deadline: new Date(Date.now() + monitor.timeout * 1000)
     }});
 
     res.status(201).json({"message": `Monitor created successfully for ${monitor.device_id}`});

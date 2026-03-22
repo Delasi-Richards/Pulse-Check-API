@@ -12,7 +12,9 @@ export const monitorSchema = z.object({
 
   alert_email: z.email("incorrect format for 'alert_email'"),
   
-  last_ping: z.date().optional()
+  daedline: z.date().optional(),
+
+  status: z.string().optional()
 })
 
 export type Monitor = z.infer<typeof monitorSchema>;
