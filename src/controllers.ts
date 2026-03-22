@@ -20,6 +20,9 @@ export async function createMonitor(req: Request, res: Response) {
       deadline: new Date(Date.now() + monitor.timeout * 60000)
     }});
 
+    // Simulating the sending of an email
+    console.log(`Sending an email to ${monitor.alert_email}`);
+
     console.log("createMonitor: Successful\n");
     res.status(201).json({"message": `Monitor created successfully for ${monitor.device_id}`});
 

@@ -28,7 +28,12 @@ export function startWorkers() {
           data: { status: "DOWN" }
         });
   
-        for (const device of downDevices) await sendEmailJob(device.device_id, device.alert_email);
+        for (const device of downDevices) {
+          console.log({
+            "ALERT": `Device ${device.device_id} is down!`,
+            "time": `${device.deadline}`
+          });
+          await sendEmailJob(device.device_id, device.alert_email)};
       }
     },
     { connection }

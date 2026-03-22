@@ -11,7 +11,7 @@ model Monitor {
   device_id     String    @unique
   timeout       Int       @default(60)
   alert_email   String
-  deadline      DateTime? @default(now()) @db.Timestamp()
+  deadline      DateTime
   status        Status    @default(ACTIVE) 
 }
 
