@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Monitor {
+  device_id     String    @unique
+  timeout       Int       @default(60)
+  alert_email   String
+  deadline      DateTime
+  status        Status    @default(ACTIVE) 
+}
+
+enum Status {
+  ACTIVE
+  PAUSED
+  DOWN
+}
