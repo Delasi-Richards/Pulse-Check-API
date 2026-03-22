@@ -57,10 +57,10 @@ The following diagrams explain the architecture of the system.
 ![UML Sequence Diagram for createMonitor](diagrams/createMonitor.png)
 
 ### Sequence Diagram for Monitor Pinging (pingMonitor)
-![UML Sequence Diagram for pingMonitor](image-5.png)
+![UML Sequence Diagram for pingMonitor](diagrams/pingMonitor.png)
 
 ### Sequence Diagram for Monitor Pausing (pauseMonitor)
-![UML Sequence Diagram for pauseMonitor](image-2.png)
+![UML Sequence Diagram for pauseMonitor](diagrams/pauseMonitor.png)
 
 ## 3. Installation and Running
 
