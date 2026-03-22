@@ -7,11 +7,17 @@ export async function createMonitor(req: Request, res: Response) {
   try {
     const monitor = monitorSchema.parse(req.body);
   
+    const existingMonitor = prisma.monitor.findFirst({ where: { device_id: monitor.device_id } });
+    if (existingMonitor != null) {
+      console.log(`Monitor for ${monitor.device_id} already exists`);
+      return res.status(400).json({"error": `Monitor for ${monitor.device_id} already exists`});
+    }
+
     await prisma.monitor.create({data: {
       device_id: monitor.device_id,
       timeout: monitor.timeout,
       alert_email: monitor.alert_email,
-      deadline: new Date(Date.now() + monitor.timeout * 1000)
+      deadline: new Date(Date.now() + monitor.timeout * 60000)
     }});
 
     console.log("createMonitor: Successful\n");
@@ -50,7 +56,7 @@ export async function pingMonitor(req: Request, res: Response) {
     
     const updatedMonitor = await prisma.monitor.update({
       where: { device_id: device_id },
-      data: { deadline: new Date(Date.now() + monitor.timeout * 1000) }
+      data: { deadline: new Date(Date.now() + monitor.timeout * 60000) }
     });
 
     if (updatedMonitor == null) throw new Error("Failed to successfully ping monitor");
@@ -92,7 +98,7 @@ export async function pauseMonitor(req: Request, res: Response) {
     const newStatus = (monitor.status == "ACTIVE"? "PAUSED" : "ACTIVE");
     const updatedMonitor = await prisma.monitor.update({
       where: { device_id: device_id },
-      data: { status: newStatus }
+      data: { status: newStatus, deadline: new Date(Date.now() + monitor.timeout * 60000) }
     });
 
     if (updatedMonitor == null) throw new Error("Failed to successfully ping monitor");

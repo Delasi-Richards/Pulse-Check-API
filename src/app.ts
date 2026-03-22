@@ -11,10 +11,7 @@ export function createApp() {
   app.use(express.json());
 
   app.use((req: Request, _res: Response, next: NextFunction) => {
-    console.log(`${req.method} ${req.path}`, {
-      body: req.body,
-      query: req.query,
-    });
+    console.log(`\n${req.method} ${req.path}`);
     next();
   })
 
