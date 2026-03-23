@@ -83,9 +83,11 @@ DATABASE_URL=       # Connection string for the database
 REDIS_URL=          # Connection string for the Redis server
 ```
 
-3.  Run the following command to push migrations to the database.
+3.  Run the following commands to push migrations to the database.
 ```bash
+npm install
 npx prisma db push
+npx prisma generate
 ```
 
 ### Running
